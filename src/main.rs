@@ -1,5 +1,3 @@
-mod viterbi;
+mod ecm;
 
-fn main() {
-    viterbi::run()
-}
+fn main() {}
