@@ -1,3 +1,5 @@
+mod viterbi;
+
 fn main() {
-    println!("Hello, world!");
+    viterbi::run()
 }
