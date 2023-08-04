@@ -1,8 +1,7 @@
 use std::fmt::Debug;
 
 use bnum::types::I256;
-use rand::rngs::StdRng;
-use rand::{Rng, SeedableRng};
+use rand::{rngs::StdRng, Rng, SeedableRng};
 
 /// Finds a factor of n using Lenstra elliptic-curve factorization.
 /// n must be an odd number with at least two distinct prime factors.
@@ -84,7 +83,7 @@ fn gcd(a: I256, b: I256) -> I256 {
 fn find_linear_combination(a: I256, b: I256) -> Point {
     if b.is_zero() {
         Point {
-            x: I256::ONE * a.signum(),
+            x: a.signum(),
             y: I256::ZERO,
         }
     } else {
@@ -99,43 +98,29 @@ fn find_linear_combination(a: I256, b: I256) -> Point {
 /// Returns either Ok(a^⁻¹ (mod n)), or Err(GCD(a,n)) if a doesn't have an inverse
 fn mod_inverse(a: I256, n: I256) -> Result<I256, I256> {
     let g = gcd(a, n).abs();
-    if g == I256::ONE {
+    if g.is_one() {
         Ok(find_linear_combination(a, n).x)
     } else {
         Err(g)
     }
 }
 
-fn _get_primes(limit: u32) -> Vec<u32> {
-    let limit = limit as usize;
-    let mut sieve = vec![true; limit];
-    let mut i = 3;
-    while i * i < limit {
-        if sieve[i] {
-            for j in (i * i..limit).step_by(2 * i) {
-                sieve[j] = false;
-            }
-        }
-        i += 2
-    }
-    let mut primes: Vec<u32> = vec![];
-    for i in (3..limit).step_by(2) {
-        if sieve[i] {
-            primes.push(i as u32)
-        }
-    }
-    primes
-}
-
 #[cfg(test)]
 mod tests {
+    use super::super::primes;
     use super::*;
 
     #[test]
     fn test_find_factor() {
-        let a = I256::from(24755137493u64);
-        let b = I256::from(94628975263u64);
-        let factor = find_factor(a * b);
-        assert!(factor == a || factor == b);
+        let start = I256::from(100000000000u64);
+        let mut rng = StdRng::seed_from_u64(0);
+
+        for i in 0..1 {
+            println!("test {}", i + 1);
+            let a = primes::find_prime(start..start.shl(1), &mut rng);
+            let b = primes::find_prime(start..start.shl(1), &mut rng);
+            let factor = find_factor(a * b);
+            assert!(factor == a || factor == b);
+        }
     }
 }
