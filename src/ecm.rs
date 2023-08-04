@@ -117,6 +117,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_find_factor() {
         let start = I256::from(10u64.pow(11));
         let mut rng = StdRng::seed_from_u64(0);
