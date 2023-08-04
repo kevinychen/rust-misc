@@ -103,9 +103,10 @@ fn find_linear_combination(a: I256, b: I256) -> Point {
 
 /// Returns either Ok(a^⁻¹ (mod n)), or Err(GCD(a,n)) if a doesn't have an inverse
 fn mod_inverse(a: I256, n: I256) -> Result<I256, I256> {
-    let g = gcd(a, n).abs();
+    let Point { x, y } = find_linear_combination(a, n);
+    let g = a * x + n * y;
     if g.is_one() {
-        Ok(find_linear_combination(a, n).x)
+        Ok(x)
     } else {
         Err(g)
     }
