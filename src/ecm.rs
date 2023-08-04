@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use super::primes;
 use bnum::types::I256;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 
@@ -11,6 +12,7 @@ pub fn find_factor(n: I256) -> I256 {
     let limit = 1u32 << (n.bits() / 5);
     println!("limit: {}", limit);
     let mut rng = StdRng::seed_from_u64(0);
+    let primes = primes::get_primes(limit);
 
     loop {
         let curve = EllipticCurve {
@@ -22,7 +24,11 @@ pub fn find_factor(n: I256) -> I256 {
         };
         println!("curve: {} {:?}", curve.a, p);
 
-        for i in 2..limit {
+        for prime in &primes {
+            let mut i = *prime;
+            while prime * i < limit {
+                i *= prime;
+            }
             match curve.multiply(p, i, n) {
                 Ok(q) => p = q,
                 Err(g) => return g,
@@ -107,15 +113,14 @@ fn mod_inverse(a: I256, n: I256) -> Result<I256, I256> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::primes;
     use super::*;
 
     #[test]
     fn test_find_factor() {
-        let start = I256::from(100000000000u64);
+        let start = I256::from(10u64.pow(11));
         let mut rng = StdRng::seed_from_u64(0);
 
-        for i in 0..1 {
+        for i in 0..5 {
             println!("test {}", i + 1);
             let a = primes::find_prime(start..start.shl(1), &mut rng);
             let b = primes::find_prime(start..start.shl(1), &mut rng);

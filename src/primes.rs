@@ -17,7 +17,7 @@ fn pow_mod(a: I256, e: I256, m: I256) -> I256 {
 }
 
 /// Returns a list of all primes less than n, in ascending order
-fn get_primes(n: u32) -> Vec<u32> {
+pub fn get_primes(n: u32) -> Vec<u32> {
     let n = n as usize;
     let mut sieve = vec![true; n];
     let mut i = 3;
